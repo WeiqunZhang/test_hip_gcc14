@@ -43,6 +43,8 @@ jobs:
         which clang
         which clang++
 
+        cat -n /usr/lib/gcc/x86_64-linux-gnu/14/../../../../include/x86_64-linux-gnu/c++/14/bits/c++config.h
+
         cd test_hip_gcc14
         make -j 4 USE_HIP=TRUE USE_MPI=FALSE USE_CCACHE=TRUE
 
