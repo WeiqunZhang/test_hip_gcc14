@@ -1,0 +1,50 @@
+name: hip
+
+on: push
+
+concurrency:
+  group: ${{ github.ref }}-${{ github.head_ref }}-HIP
+  cancel-in-progress: true
+
+jobs:
+  test-hip-gcc14:
+    name: test hip w/ gcc 14
+    runs-on: ubuntu-24.04
+    steps:
+    - name: Checkout test code
+      uses: actions/checkout@v4
+      with:
+        path: test_hip_gcc14
+    - name: Checkout AMReX
+      uses: actions/checkout@v4
+      with:
+        repository: AMReX-Codes/amrex
+        path: amrex
+    - name: Set Up Cache
+      uses: actions/cache@v4
+      with:
+        path: ~/.cache/ccache
+        key: ccache-${{ github.workflow }}-${{ github.job }}-git-${{ github.sha }}
+        restore-keys: |
+             ccache-${{ github.workflow }}-${{ github.job }}-git-
+    - name: Load Dependencies
+      run: |
+        amrex/.github/workflows/dependencies/dependencies_hip.sh
+        amrex/.github/workflows/dependencies/dependencies_ccache.sh
+    - name: Build
+      run: |
+        export CCACHE_COMPRESS=1
+        export CCACHE_COMPRESSLEVEL=10
+        export CCACHE_MAXSIZE=200M
+        ccache -z
+
+        source /etc/profile.d/rocm.sh
+        hipcc --version
+        which clang
+        which clang++
+
+        cd test_hip_gcc14
+        make -j 4 USE_HIP=TRUE USE_MPI=FALSE USE_CCACHE=TRUE
+
+        ccache -s
+        du -hs ~/.cache/ccache
