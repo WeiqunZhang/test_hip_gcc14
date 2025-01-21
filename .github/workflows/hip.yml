@@ -9,7 +9,7 @@ concurrency:
 jobs:
   test-hip-gcc14:
     name: test hip w/ gcc 14
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-latest
     steps:
     - name: Checkout test code
       uses: actions/checkout@v4
@@ -29,7 +29,7 @@ jobs:
              ccache-${{ github.workflow }}-${{ github.job }}-git-
     - name: Load Dependencies
       run: |
-        amrex/.github/workflows/dependencies/dependencies_hip.sh
+        amrex/.github/workflows/dependencies/dependencies_hip.sh 6.3.1
         amrex/.github/workflows/dependencies/dependencies_ccache.sh
     - name: Build
       run: |
